@@ -20,20 +20,23 @@ A Streamlit-powered application that automatically generates and emails detailed
 - Uses Google Search API through Serper
 - Easy to read formatted output
 
-## Requirements
+## 🚀 Requirements
 
-- Python 3.x
-- requests library
+- Python 3.13+
+- Streamlit
+- Google AI API key
+- Serper API key
+- Gmail account with App Password
 
-## Installation
+## 📦 Installation
 
 1. Clone this repository:
 ```bash
-git clone https://github.com/naman25/shop-blog-generator.git
+git clone https://github.com/mishranaman152007-del/shop-blog-generator.git
 cd shop-blog-generator
 ```
 
-2. Create a virtual environment (optional but recommended):
+2. Create a virtual environment:
 ```bash
 python -m venv .venv
 source .venv/bin/activate  # On Windows use: .venv\Scripts\activate
@@ -44,13 +47,36 @@ source .venv/bin/activate  # On Windows use: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-## Usage
+4. Set up your configuration:
+   Create `.streamlit/secrets.toml` with:
+   ```toml
+   [email]
+   sender = "your-email@gmail.com"
+   password = "your-app-specific-password"
 
-1. Make sure you have your Serper API key ready
-2. Run the script:
-```bash
-python src/clothes_shops.py
-```
+   [api_keys]
+   google_ai = "YOUR_GOOGLE_AI_API_KEY"
+   serper = "YOUR_SERPER_API_KEY"
+   ```
+
+## 🔒 Security Setup
+
+1. Google AI API:
+   - Go to [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a new project or select existing one
+   - Enable the Generative Language API
+   - Create credentials (API key)
+   - Add the key to your secrets.toml
+
+2. Serper API:
+   - Sign up at [Serper.dev](https://serper.dev)
+   - Get your API key
+   - Add it to secrets.toml
+
+3. Gmail:
+   - Enable 2-Step Verification in your Google Account
+   - Generate an App Password
+   - Use it in secrets.toml
 
 The script will display information about various clothing stores in Satna, including:
 - Shop names

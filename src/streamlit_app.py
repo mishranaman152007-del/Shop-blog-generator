@@ -33,8 +33,13 @@ def search_clothes_shops():
 
 def generate_blog_post(shops_data):
     # Configure Gemini API
-    genai.configure(api_key='AIzaSyB_Mslm7fKrRZ7WWs9-IW3D595v1VNrXVc')
-    model = genai.GenerativeModel('models/gemini-pro')
+    try:
+        api_key = st.secrets["api_keys"]["google_ai"]
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel('models/gemini-pro')
+    except Exception as e:
+        st.error("⚠️ Error: Google AI API key not configured. Please set up your API key in .streamlit/secrets.toml")
+        return None
     
     # Prepare the context from shops data
     shops_context = ""
