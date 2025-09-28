@@ -1,6 +1,17 @@
-# Clothes Shops Finder - Satna
+# 🏪 Shop Blog Generator
 
-A Python script that uses the Serper API to fetch information about clothing stores in Satna, Madhya Pradesh. The script provides details about various clothing shops including their names, descriptions, locations, and contact information when available.
+A Streamlit-powered application that automatically generates and emails detailed blog posts about clothing shops in Satna, Madhya Pradesh. The app uses Google's Search API (via Serper) and Generative AI to create engaging content.
+
+![Python](https://img.shields.io/badge/Python-3.13-blue.svg)
+![Streamlit](https://img.shields.io/badge/Streamlit-1.50.0-red.svg)
+![License](https://img.shields.io/badge/License-MIT-green.svg)
+
+## ✨ Features
+
+- **🔍 Automated Shop Research**: Fetches real-time data about clothing shops using Google Search API
+- **🤖 AI-Powered Content Generation**: Uses Google's Generative AI to create engaging blog posts
+- **📧 Email Integration**: Automatically sends formatted blog posts via email
+- **🎯 User-Friendly Interface**: Simple 3-step process with Streamlit's intuitive UI
 
 ## Features
 
@@ -18,8 +29,8 @@ A Python script that uses the Serper API to fetch information about clothing sto
 
 1. Clone this repository:
 ```bash
-git clone <repository-url>
-cd Serper - agent
+git clone https://github.com/naman25/shop-blog-generator.git
+cd shop-blog-generator
 ```
 
 2. Create a virtual environment (optional but recommended):

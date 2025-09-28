@@ -2,26 +2,10 @@ import streamlit as st
 import requests
 import google.generativeai as genai
 import json
-from email.mime.text imp        st.info("Sending email...")
-        try:
-            server = smtplib.SMTP('smtp.gmail.com', 587)
-            server.starttls()
-            server.login(sender_email, sender_password)
-            server.send_message(msg)
-            server.quit()
-            st.success("Email sent successfully! 📧")
-            return True
-        except smtplib.SMTPAuthenticationError as e:
-            st.error(f"Authentication Error: Please check your email credentials. Error: {str(e)}")
-            return False
-        except smtplib.SMTPException as e:
-            st.error(f"SMTP Error: {str(e)}")
-            return False
-        except Exception as e:
-            st.error(f"Unexpected error: {str(e)}")
-            return Falsext
+from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import smtplib
+import re  # Added for email validation
 
 # Configure the page
 st.set_page_config(page_title="Shop Blog Generator", page_icon="🏪")
@@ -122,75 +106,44 @@ def send_email(blog_content, recipient_email):
         msg['To'] = recipient_email
         msg['Subject'] = "Shopping Blog: Clothing Stores in Satna"
         
+        # Add formatted blog content
         formatted_content = format_blog_email(blog_content)
         msg.attach(MIMEText(formatted_content, 'plain'))
         
         # Connect to SMTP with detailed logging
         st.info("Connecting to SMTP server...")
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        
-        st.info("Starting TLS...")
-        server.starttls()
-        
-        st.info("Attempting login...")
-        server.login(sender_email, sender_password)
-        
-        st.info("Sending email...")
-        
-        # Create message
-        msg = MIMEMultipart()
-        msg['From'] = sender_email
-        msg['To'] = recipient_email
-        msg['Subject'] = "Shopping Blog: Clothing Stores in Satna"
-        
-        # Add formatted blog content
-        formatted_content = format_blog_email(blog_content)
-        msg.attach(MIMEText(formatted_content, 'plain'))
-        
-        # Connect to SMTP server and send email
-        with smtplib.SMTP('smtp.gmail.com', 587) as server:
-            server.starttls()
-            server.login(sender_email, sender_password)
-            server.send_message(msg)
-            
-        return True
-        
-    except Exception as e:
-        st.error(f"Error sending email: {e}")
-        return False
-        msg = MIMEMultipart()
-        msg['From'] = f"Shop Blog Generator <{sender_email}>"
-        msg['To'] = recipient_email
-        msg['Subject'] = "New Blog Post: Shopping Guide for Satna, Madhya Pradesh"
-        
-        # Format and add body
-        formatted_content = format_blog_email(blog_content)
-        msg.attach(MIMEText(formatted_content, 'plain'))
         
         try:
-            # Setup SMTP server with timeout
-            server = smtplib.SMTP('smtp.gmail.com', 587, timeout=30)
-            server.starttls()
-            
-            # Login attempt
-            server.login(sender_email, sender_password)
-            
-            # Send email
-            server.send_message(msg)
-            return True
-            
-        except smtplib.SMTPAuthenticationError:
-            st.error("Failed to authenticate with the email server. Please check your email credentials in secrets.toml")
+            with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:  # Using SSL connection
+                st.info("Attempting login...")
+                server.login(sender_email, sender_password)
+                
+                st.info("Sending email...")
+                server.send_message(msg)
+                
+                st.success("✉️ Email sent successfully!")
+                return True
+                
+        except smtplib.SMTPAuthenticationError as auth_error:
+            st.error(f"⚠️ Authentication failed. Please make sure you have:\n1. Enabled 2-Step Verification in your Google Account\n2. Using the correct App Password\nError: {str(auth_error)}")
             return False
         except smtplib.SMTPException as smtp_error:
-            st.error(f"SMTP error occurred: {smtp_error}")
+            st.error(f"📧 SMTP Error: {str(smtp_error)}")
             return False
-        finally:
-            try:
-                server.quit()
-            except:
-                pass
-                
+        except Exception as e:
+            st.error(f"❌ Unexpected error: {str(e)}")
+            return False
+            
+    except Exception as e:
+        st.error(f"❌ Error preparing email: {str(e)}")
+        return False
+            
+    except smtplib.SMTPAuthenticationError:
+        st.error("Failed to authenticate with the email server. Please check your email credentials.")
+        return False
+    except smtplib.SMTPException as smtp_error:
+        st.error(f"SMTP error occurred: {smtp_error}")
+        return False
     except Exception as e:
         st.error(f"Unexpected error occurred while sending email: {e}")
         return False
@@ -233,39 +186,21 @@ def main():
             recipient_email = st.text_input("Enter recipient email:", key="email_input")
             
             # Show email preview
-            if recipient_email and is_valid_email(recipient_email):
-                with st.expander("Preview Email"):
-                    st.markdown("### Email Preview")
-                    st.text(format_blog_email(st.session_state.blog_content))
-                
-                # Send email button
-                if st.button("Send Email"):
-                    with st.spinner("Sending email..."):
-                        if send_email(st.session_state.blog_content, recipient_email):
-                            st.success("Email sent successfully! 📧")
-                        else:
-                            st.error("Failed to send email. Please try again.")
-            elif recipient_email:
-                st.warning("Please enter a valid email address.")
-
-if __name__ == "__main__":
-    main()
-            # Send email button
-            col1, col2 = st.columns([1, 3])
-            with col1:
-                send_button = st.button("Send Email")
-            
-            if send_button:
-                if not recipient_email:
-                    st.warning("Please enter a recipient email address.")
-                elif not is_valid_email(recipient_email):
-                    st.error("Please enter a valid email address.")
+            if recipient_email:
+                if is_valid_email(recipient_email):
+                    with st.expander("Preview Email"):
+                        st.markdown("### Email Preview")
+                        st.text(format_blog_email(st.session_state.blog_content))
+                    
+                    # Send email button
+                    if st.button("Send Email"):
+                        with st.spinner("Sending email..."):
+                            if send_email(st.session_state.blog_content, recipient_email):
+                                st.success("✉️ Email sent successfully!")
+                                # Clear the email input after successful send
+                                st.session_state.email_input = ""
                 else:
-                    with st.spinner("Sending email..."):
-                        if send_email(st.session_state.blog_content, recipient_email):
-                            st.success("✉️ Email sent successfully!")
-                            # Clear the email input after successful send
-                            st.session_state.email_input = ""
+                    st.warning("Please enter a valid email address.")
 
 if __name__ == "__main__":
     main()
